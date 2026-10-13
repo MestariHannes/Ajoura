@@ -804,6 +804,27 @@ window.AjouraSV = ({ re, N, DATE, plural, lower, t, tr }) => {
     'Linkki kopioitu leikepöydälle.': 'Länken kopierad till urklipp.',
     'AJOURA – autosi oma huoltokirja.': 'AJOURA – din bils egen servicebok.',
     'Sininen Volvo-farmari': 'Blå Volvo-kombi',
+    // Several photos per car, notes page
+    '＋ Lisää omia kuvia': '＋ Lägg till egna bilder',
+    'Esim. renkaiden koot, hallipaikka, varaosanumerot': 'T.ex. däckdimensioner, hallplats, reservdelsnummer',
+    'Uusi muistiinpano': 'Ny anteckning',
+    'Esim. talvirenkaat 205/55 R16, hallipaikka 12, pyyhkijät 60 cm': 'T.ex. vinterdäck 205/55 R16, hallplats 12, torkarblad 60 cm',
+    'Tallenna muistiinpano': 'Spara anteckning',
+    'Ei vielä muistiinpanoja. Kirjoita ensimmäinen yllä.': 'Inga anteckningar än. Skriv den första ovan.',
+    'Muistiinpanot tallentuvat vain tähän laitteeseen. Ne eivät siirry ostajalle siirtotiedostossa eivätkä historialinkissä.': 'Anteckningarna sparas bara i den här enheten. De följer inte med till köparen i överföringsfilen eller historiklänken.',
+    'Muistiinpanot.': 'Anteckningar.',
+    'Kirjaa auton pienet asiat talteen: renkaiden koot, hallipaikka, varaosanumerot. Jokainen muistiinpano saa päivämäärän.': 'Spara bilens små detaljer: däckdimensioner, hallplats, reservdelsnummer. Varje anteckning får ett datum.',
+    'Muokkaa muistiinpanoa': 'Redigera anteckningen',
+    'Ei muistiinpanoa.': 'Ingen anteckning.',
+    'Kirjoita ensin muistiinpano.': 'Skriv en anteckning först.',
+    'Poistetaanko muistiinpano?': 'Ta bort anteckningen?',
+    'Kuvia ei voitu tallentaa: laitteen tila ei riitä.': 'Bilderna kunde inte sparas: det finns inte tillräckligt med utrymme i enheten.',
+    'Autolle mahtuu enintään 13 kuvaa.': 'En bil kan ha högst 13 bilder.',
+    'Kuvia ei voitu avata. Valitse kuvatiedostoja.': 'Bilderna kunde inte öppnas. Välj bildfiler.',
+    '✓ Pääkuva vaihdettu.': '✓ Huvudbilden har bytts.',
+    'Enintään 12 lisäkuvaa autoa kohden.': 'Högst 12 extra bilder per bil.',
+    'Pääkuva poistettu. Seuraava kuva on nyt pääkuva.': 'Huvudbilden har tagits bort. Nästa bild är nu huvudbild.',
+    'Kuvat autosta': 'Bilder av bilen',
   };
   const days = { maanantai: 'måndag', tiistai: 'tisdag', keskiviikko: 'onsdag', torstai: 'torsdag', perjantai: 'fredag', lauantai: 'lördag', sunnuntai: 'söndag' };
   const months = { tammikuuta: 'januari', helmikuuta: 'februari', maaliskuuta: 'mars', huhtikuuta: 'april', toukokuuta: 'maj', kesäkuuta: 'juni', heinäkuuta: 'juli', elokuuta: 'augusti', syyskuuta: 'september', lokakuuta: 'oktober', marraskuuta: 'november', joulukuuta: 'december' };
@@ -897,6 +918,9 @@ window.AjouraSV = ({ re, N, DATE, plural, lower, t, tr }) => {
     [re('(Huolto|Katsastus) lähestyy: (.+)'), (m, w, c) => what(w) + ' närmar sig: ' + c],
     [re('Huoltohistoria: (.+)'), (m, c) => 'Servicehistorik: ' + c],
     [re('(.+): huoltohistoria AJOURAsta\\.'), (m, c) => c + ': servicehistorik från AJOURA.'],
+    [re('ESITTELYVIDEO · (\\d+:\\d\\d)'), (m, d) => 'INTROVIDEO · ' + d],
+    [re('Aseta kuva (\\d+) pääkuvaksi'), (m, n) => 'Gör bild ' + n + ' till huvudbild'],
+    [re('(\\d+) kuvaa · ★ vaihtaa pääkuvan'), (m, n) => n + ' bilder · ★ byter huvudbild'],
     // Shared history page (historia.html)
     [re('(.+) · huoltohistoria · AJOURA'), (m, c) => c + ' · servicehistorik · AJOURA'],
     [re('merkintää, (\\d+) kuitilla'), (m, n) => 'poster, ' + n + ' med kvitto'],

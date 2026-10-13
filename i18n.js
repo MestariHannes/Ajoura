@@ -334,6 +334,29 @@
     'Talvirenkaat alle viimeistään 30.11.': 'Winter tyres on by 30 November', 'Nastarenkaat pois huhtikuun alussa': 'Studded tyres off in early April',
     'Huoltoarvio perustuu merkintöihisi ja Minä-välilehden huoltoväliin. Katsastusarvio noudattaa Suomen sääntöä (4, 6 ja 8 vuotta, sitten vuosittain) vuosimallin mukaan. Tarkan päivän näet Traficomin Omat ajoneuvotiedot -palvelusta.': 'The service estimate uses your entries and the interval on the Me tab. The inspection estimate follows the Finnish rule (at 4, 6 and 8 years, then yearly) by model year. The exact date is in Traficom’s own-vehicle service.',
   });
+  // Several photos per car, notes page (13.10.2026)
+  Object.assign(D, {
+    '＋ Lisää omia kuvia': '＋ Add your own photos',
+    'Esim. renkaiden koot, hallipaikka, varaosanumerot': 'E.g. tyre sizes, parking spot, part numbers',
+    'Uusi muistiinpano': 'New note',
+    'Esim. talvirenkaat 205/55 R16, hallipaikka 12, pyyhkijät 60 cm': 'E.g. winter tyres 205/55 R16, parking spot 12, wipers 60 cm',
+    'Tallenna muistiinpano': 'Save note',
+    'Ei vielä muistiinpanoja. Kirjoita ensimmäinen yllä.': 'No notes yet. Write the first one above.',
+    'Muistiinpanot tallentuvat vain tähän laitteeseen. Ne eivät siirry ostajalle siirtotiedostossa eivätkä historialinkissä.': 'Notes are saved on this device only. They are not passed to a buyer in the transfer file or the history link.',
+    'Muistiinpanot.': 'Notes.',
+    'Kirjaa auton pienet asiat talteen: renkaiden koot, hallipaikka, varaosanumerot. Jokainen muistiinpano saa päivämäärän.': 'Keep the car’s small details: tyre sizes, parking spot, part numbers. Every note gets a date.',
+    'Muokkaa muistiinpanoa': 'Edit note',
+    'Ei muistiinpanoa.': 'No note.',
+    'Kirjoita ensin muistiinpano.': 'Write a note first.',
+    'Poistetaanko muistiinpano?': 'Delete this note?',
+    'Kuvia ei voitu tallentaa: laitteen tila ei riitä.': 'Photos could not be saved: not enough space on the device.',
+    'Autolle mahtuu enintään 13 kuvaa.': 'A car can have at most 13 photos.',
+    'Kuvia ei voitu avata. Valitse kuvatiedostoja.': 'The photos could not be opened. Choose image files.',
+    '✓ Pääkuva vaihdettu.': '✓ Main photo changed.',
+    'Enintään 12 lisäkuvaa autoa kohden.': 'At most 12 extra photos per car.',
+    'Pääkuva poistettu. Seuraava kuva on nyt pääkuva.': 'Main photo removed. The next photo is now the main photo.',
+    'Kuvat autosta': 'Photos of the car',
+  });
   // Website (index.html, historia.html, tietosuoja.html). Added only where the app has no entry yet.
   const SITE = {
     'AJOURA — Ajoneuvosi historia yhdessä paikassa': 'AJOURA — Your vehicle’s history in one place',
@@ -608,6 +631,9 @@
     [re('(Huolto|Katsastus) lähestyy: (.+)'), (m, w, c) => (w === 'Huolto' ? 'Service' : 'Inspection') + ' coming up: ' + c],
     [re('Huoltohistoria: (.+)'), (m, c) => 'Service history: ' + c],
     [re('(.+): huoltohistoria AJOURAsta\\.'), (m, c) => c + ': service history from AJOURA.'],
+    [re('ESITTELYVIDEO · (\\d+:\\d\\d)'), (m, d) => 'INTRO VIDEO · ' + d],
+    [re('Aseta kuva (\\d+) pääkuvaksi'), (m, n) => 'Make photo ' + n + ' the main photo'],
+    [re('(\\d+) kuvaa · ★ vaihtaa pääkuvan'), (m, n) => n + ' photos · ★ sets the main photo'],
     // Shared history page (historia.html)
     [re('(.+) · huoltohistoria · AJOURA'), (m, c) => c + ' · service history · AJOURA'],
     [re('merkintää, (\\d+) kuitilla'), (m, n) => 'entries, ' + n + ' with receipt'],

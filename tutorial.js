@@ -38,8 +38,8 @@
         ['Lägg till din bil', 'Med registreringsnummer eller för hand. Välj modell, karosstyp och färg.'],
         ['Registrera service', 'Oljebyten, besiktningar och reparationer, med kvitton.'],
         ['Följ tankningarna', 'Medelförbrukning och körkostnad räknas ut åt dig.'],
-        ['Påminnelse i tid', 'Du ser direkt när nästa service står i tur.'],
-        ['Rapport vid försäljning', 'Hela historiken som en snygg PDF-rapport till köparen.']
+        ['Påminnelse i tid', 'Service, besiktning och däckbyte: du ser i god tid vad som väntar.'],
+        ['Historik till köparen', 'Hela historiken som länk eller PDF-rapport när du säljer bilen.']
       ],
       rows: ['Oljebyte', 'Besiktning', 'Däckbyte'], dates: ['23.9.2026 · 184 320 km', '15.2.2026 · 181 120 km', '5.4.2026 · 181 900 km'],
       cons: 'Medelförbrukning', reminder: 'NÄSTA SERVICE', due: 'Senast 23.9.2027', report: 'Servicehistorikrapport'
