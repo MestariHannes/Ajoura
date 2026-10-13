@@ -1,11 +1,12 @@
 'use strict';
-// AJOURA English layer. Non-invasive: the app keeps rendering Finnish, and this file translates the
-// rendered DOM (text nodes + a few attributes) after the fact. Stored data stays Finnish.
-// Language lives in localStorage 'ajoura-lang' ('fi' | 'en'); with 'fi' nothing is touched.
+// AJOURA language layer (English + Swedish). Non-invasive: the app keeps rendering Finnish, and this file
+// translates the rendered DOM (text nodes + a few attributes) after the fact. Stored data stays Finnish.
+// Language lives in localStorage 'ajoura-lang' ('fi' | 'en' | 'sv'); with 'fi' nothing is touched.
+// The English tables live here; the Swedish ones come from i18n-sv.js (window.AjouraSV), loaded first.
 (() => {
   const KEY = 'ajoura-lang';
   let lang = 'fi';
-  try { const v = localStorage.getItem(KEY); if (v === 'en' || v === 'fi') lang = v; } catch (e) {}
+  try { const v = localStorage.getItem(KEY); if (v === 'en' || v === 'sv' || v === 'fi') lang = v; } catch (e) {}
 
   // Exact matches, Finnish -> English (looked up on trimmed text).
   const D = {
@@ -327,12 +328,200 @@
     'Palaute avautuu puhelimen jakovalikkoon, josta valitset vastaanottajan (esim. WhatsApp). Mukaan liitetään sovelluksen versio ja laitetyyppi, ei autojesi tietoja.': 'Feedback opens in your phone’s share menu, where you pick the recipient (e.g. WhatsApp). The app version and device type are attached, not your car data.',
     '✓ Palaute kopioitu. Liitä se viestiin AJOURAn tekijöille.': '✓ Feedback copied. Paste it into a message to the AJOURA team.',
     'Anna palautetta': 'Give feedback', 'Testaatko AJOURAa? Kerro, mikä toimi ja mikä ei.': 'Testing AJOURA? Tell us what worked and what didn’t.',
-    'Tietosuoja': 'Privacy', 'Kehitysvaiheen sovellus': 'App in development', 'AJOURA 0.9 (testiversio) ·': 'AJOURA 0.9 (test version) ·',
+    'Tarkista päivämäärä.': 'Check the date.', 'Tietosuoja': 'Privacy', 'Kehitysvaiheen sovellus': 'App in development', 'AJOURA 0.9 (testiversio) ·': 'AJOURA 0.9 (test version) ·',
     'Huolto on myöhässä päivämäärän mukaan.': 'The service is overdue by date.', 'Omistajanvaihdos on jo kirjattu tälle päivälle.': 'A change of ownership is already logged for this day.',
     'TALVIRENKAIDEN AIKA': 'WINTER TYRE SEASON', 'KESÄRENKAIDEN AIKA': 'SUMMER TYRE SEASON',
     'Talvirenkaat alle viimeistään 30.11.': 'Winter tyres on by 30 November', 'Nastarenkaat pois huhtikuun alussa': 'Studded tyres off in early April',
     'Huoltoarvio perustuu merkintöihisi ja Minä-välilehden huoltoväliin. Katsastusarvio noudattaa Suomen sääntöä (4, 6 ja 8 vuotta, sitten vuosittain) vuosimallin mukaan. Tarkan päivän näet Traficomin Omat ajoneuvotiedot -palvelusta.': 'The service estimate uses your entries and the interval on the Me tab. The inspection estimate follows the Finnish rule (at 4, 6 and 8 years, then yearly) by model year. The exact date is in Traficom’s own-vehicle service.',
   });
+  // Website (index.html, historia.html, tietosuoja.html). Added only where the app has no entry yet.
+  const SITE = {
+    'AJOURA — Ajoneuvosi historia yhdessä paikassa': 'AJOURA — Your vehicle’s history in one place',
+    'Siirry sisältöön': 'Skip to content',
+    'Ajouran navigaatio': 'AJOURA navigation',
+    'Ajouran etusivu': 'AJOURA home page',
+    'Näin se toimii': 'How it works',
+    'Lataa sovellus': 'Get the app',
+    'Kysyttyä': 'FAQ',
+    'Yhteystiedot': 'Contact',
+    'Kokeile sovellusta': 'Try the app',
+    'OMA AUTO. OMA HISTORIA.': 'YOUR CAR. YOUR HISTORY.',
+    'Ajoneuvosi historia.': 'Your vehicle’s history.',
+    'Yhdessä paikassa.': 'In one place.',
+    'Autosi matka ansaitsee oman muistin.': 'Your car’s journey deserves a memory of its own.',
+    'Ajoura on kehitteillä oleva digitaalinen ajoneuvopäiväkirja. Ajoneuvot, mittarilukemat ja huoltotapahtumat selkeänä kokonaisuutena.': 'AJOURA is a digital vehicle logbook in development. Vehicles, odometer readings and service events in one clear view.',
+    'Kokeile AJOURAa': 'Try AJOURA',
+    'Tutustu ideaan': 'Explore the idea',
+    'Katso esittelyvideo': 'Watch the intro video',
+    'Interaktiivinen konseptidemo · Ei kirjautumista ·': 'Interactive concept demo · No sign-in ·',
+    'Esimerkki ajoneuvon päiväkirjasta': 'Example of a vehicle logbook',
+    'OMA AJONEUVO': 'MY VEHICLE',
+    'Esimerkki': 'Example',
+    'Tapahtumaa': 'Events',
+    'Kuvitteellinen huoltohistoria · Tyylitelty malli': 'Fictional service history · Stylised model',
+    'Matka jää muistiin.': 'The journey is remembered.',
+    'SUUNNITELTU AUTOILIJAN ARKEEN': 'DESIGNED FOR EVERYDAY DRIVING',
+    'Yksi ajoneuvo kerrallaan. Yksi merkintä kerrallaan.': 'One vehicle at a time. One entry at a time.',
+    'ESITTELYVIDEO · 0:20': 'INTRO VIDEO · 0:20',
+    'Katso, miten': 'See how',
+    'toimii.': 'works.',
+    'MIKÄ AJOURA ON?': 'WHAT IS AJOURA?',
+    'Vähemmän muistelua.': 'Less trying to remember.',
+    'Enemmän selkeyttä.': 'More clarity.',
+    'Milloin öljyt vaihdettiin? Paljonko silloin oli ajettu? Ajouran idea on yksinkertainen: autosi tapahtumat kulkevat samassa päiväkirjassa.': 'When was the oil changed? What was the mileage then? The idea behind AJOURA is simple: everything that happens to your car goes in the same logbook.',
+    '01 / AJONEUVOT': '01 / VEHICLES',
+    'Oma auto, oman näköinen.': 'Your car, looking like yours.',
+    'Lisää autosi rekisteritunnuksella tai käsin ja valitse korimalli ja väri: maastoauto, farmari, coupé, tila-auto ja muut. AJOURA näyttää autostasi mallin ja vuosimallin mukaisen kuvan valitsemallasi värillä.': 'Add your car by licence plate or by hand and pick the body style and colour: SUV, estate, coupé, MPV and more. AJOURA shows a picture of your car’s model and model year in the colour you chose.',
+    '02 / TAPAHTUMAT': '02 / EVENTS',
+    'Kirjaa huolto, renkaanvaihto tai katsastus päivämäärän ja ajokilometrien kanssa.': 'Log a service, tyre change or inspection with the date and mileage.',
+    '03 / HISTORIA': '03 / HISTORY',
+    'Koko matka näkyviin.': 'The whole journey in view.',
+    'Palaa aiempiin tapahtumiin ja avaa niiden tiedot ilman hajanaisia muistiinpanoja.': 'Go back to earlier events and open their details, without scattered notes.',
+    'NÄIN SE TOIMII': 'HOW IT WORKS',
+    'Arjen pienistä teoista': 'Small everyday actions',
+    'syntyy hyvä historia.': 'make a good history.',
+    'Kokeile itse demossa': 'Try it yourself in the demo',
+    'Rekisteritunnuksella tai käsin. Valitse korimalli ja väri, niin talli näyttää juuri sinun autosi ja kojelauta tervehtii nimelläsi.': 'By licence plate or by hand. Pick the body style and colour, and your garage shows your own car while the dashboard greets you by name.',
+    'Lisää tapahtuma.': 'Add an event.',
+    'Mitä tehtiin, milloin ja millä mittarilukemalla? Lyhyt merkintä riittää.': 'What was done, when, and at what mileage? A short entry is enough.',
+    'Palaa historiaan.': 'Look back at the history.',
+    'Tapahtuma liittyy auton aikajanaan ja löytyy sieltä seuraavallakin kerralla.': 'The event joins the car’s timeline and is there next time too.',
+    'MITÄ SEURAAVAKSI': 'WHAT’S NEXT',
+    'Ensin hyvä päiväkirja.': 'First, a good logbook.',
+    'Sitten älykkäämpi.': 'Then a smarter one.',
+    'Ajouraa rakennetaan vaiheittain. Vasemmalla olevat toimivat jo testiversiossa. Oikealla olevat ovat suunnitelmia, eivät vielä valmiita palveluita.': 'AJOURA is being built step by step. The items on the left already work in the test version. The ones on the right are plans, not finished services yet.',
+    'Toimii testiversiossa': 'Works in the test version',
+    'Kojelauta: autot, kulut ja viimeisimmät tapahtumat': 'Dashboard: cars, costs and latest events',
+    'Auton lisäys rekisteritunnuksella': 'Adding a car by licence plate',
+    '(simuloitu haku)': '(simulated lookup)',
+    'Mallikohtainen autokuva noin 600 mallisukupolvelle ja kahdeksan väriä': 'Model-specific car pictures for about 600 model generations, in eight colours',
+    'Henkilökohtainen kojelauta ja oma huoltomuistutuksen väli': 'Personal dashboard and your own service reminder interval',
+    'Tiedot säilyvät omassa puhelimessa, varmuuskopio tiedostoon': 'Data stays on your own phone, backup to a file',
+    'Mittarilukeman johdonmukaisuuden tarkistus': 'Odometer consistency check',
+    'Kuitit ja kuvat merkintöihin, tankkaukset ja muistiinpanot': 'Receipts and photos on entries, fill-ups and notes',
+    'Tulostettava huoltohistoriaraportti': 'Printable service history report',
+    'Huoltohistoria linkkinä auton ostajalle': 'Service history as a link for the buyer',
+    'Katsastusarvio Suomen sääntöjen mukaan ja rengaskauden muistutus': 'Inspection estimate under Finnish rules and tyre season reminder',
+    'Muistutukset puhelimen kalenteriin': 'Reminders in your phone’s calendar',
+    'Suunnitteilla': 'Planned',
+    'Oma tili ja tietojen turvallinen tallennus pilveen': 'Your own account and secure cloud storage',
+    'Merkinnän esitäyttö kuitin kuvasta': 'Entry pre-filled from a photo of the receipt',
+    'Huoltomuistutukset ilmoituksina puhelimeen': 'Service reminders as phone notifications',
+    'Oikea rekisterihaku': 'Real registry lookup',
+    'AUTON MYYNTI': 'SELLING THE CAR',
+    'Huollettu auto.': 'A serviced car.',
+    'Ja sen voi todistaa.': 'And you can prove it.',
+    'Ostaja kysyy aina saman: onko autoa huollettu? AJOURAssa vastaus on valmiina, kun olet kirjannut huollot sitä mukaa kuin ne tehdään.': 'Buyers always ask the same thing: has the car been serviced? In AJOURA the answer is ready, as long as you log services as they happen.',
+    'Kirjaa matkan varrella': 'Log as you go',
+    'Raportista yksi painallus: ostaja avaa historian millä tahansa selaimella, ilman sovellusta. Kuvat ja muistiinpanot pysyvät puhelimessasi.': 'One tap from the report: the buyer opens the history in any browser, no app needed. Photos and notes stay on your phone.',
+    'Anna historia ostajalle': 'Give the history to the buyer',
+    'Omistajanvaihdoksessa siirtotiedosto vie koko historian kuitteineen uuden omistajan AJOURAan.': 'At a change of ownership, a transfer file moves the whole history, receipts included, into the new owner’s AJOURA.',
+    'AJOURA APP / ENSIMMÄINEN KATSAUS': 'AJOURA APP / FIRST LOOK',
+    'Tuntuuko omalta?': 'Does it feel like yours?',
+    'Kokeile, älä vain katso.': 'Try it, don’t just look.',
+    'Testivaihe on alkanut.': 'Testing has started.',
+    'AJOURAa voi jo käyttää omalla autolla: tiedot tallentuvat omaan puhelimeesi. Etsimme ensimmäisiä testaajia.': 'You can already use AJOURA with your own car: data is stored on your own phone. We are looking for our first testers.',
+    'Kerro kokemuksesi sovelluksen Apu-välilehdeltä kohdasta Kerro meille.': 'Share your experience in the app under Help → Tell us.',
+    'TESTIVERSIO / 2026': 'TEST VERSION / 2026',
+    'LATAA SOVELLUS': 'GET THE APP',
+    'puhelimeesi': 'on your phone',
+    'kolmessa askeleessa.': 'in three steps.',
+    'Sovellus asennetaan suoraan selaimesta. Sovelluskauppaa tai tiliä ei tarvita, ja tiedot pysyvät omassa puhelimessasi.': 'The app installs straight from the browser. No app store or account needed, and your data stays on your own phone.',
+    'AJOURA-sovellus': 'the AJOURA app',
+    'Safarilla': 'in Safari',
+    '-painiketta.': ' button.',
+    'Chromella': 'in Chrome',
+    'tai valikosta': 'or in the menu',
+    'Valmis kokeilemaan?': 'Ready to try it?',
+    'Asennusohje avautuu puhelimellasi automaattisesti.': 'The install guide opens automatically on your phone.',
+    'Jaa linkki kaverille': 'Share the link with a friend',
+    'USEIN KYSYTTYÄ': 'FREQUENTLY ASKED',
+    'Vastauksia ennen kuin kysyt.': 'Answers before you ask.',
+    'Maksaako AJOURA jotain?': 'Does AJOURA cost anything?',
+    'Kokeiluversio on maksuton. Hinnoittelusta kerrotaan ennen varsinaista julkaisua.': 'The trial version is free. Pricing will be announced before the actual launch.',
+    'Missä tietoni säilytetään?': 'Where is my data kept?',
+    'Tiedot tallentuvat vain omaan puhelimeesi tai tietokoneellesi. Mitään ei lähetetä palvelimelle. Asenna sovellus kotivalikkoon ja ota välillä varmuuskopio: selain voi poistaa tiedot sivulta, jota ei ole käytetty pitkään aikaan.': 'Data is stored only on your own phone or computer. Nothing is sent to a server. Install the app on your home screen and take a backup now and then: a browser may delete data from a site that hasn’t been used for a long time.',
+    'Hakeeko AJOURA autoni tiedot rekisteristä?': 'Does AJOURA fetch my car’s details from the registry?',
+    'Ei vielä. Rekisterihaku on tällä hetkellä esimerkkiaineistoon perustuva demo. Oikeaa hakua varten tarvitaan Traficomin lupa, ja sitä selvitetään.': 'Not yet. The registry lookup is currently a demo based on sample data. A real lookup needs a licence from Traficom, which is being looked into.',
+    'Voinko lisätä useamman auton?': 'Can I add more than one car?',
+    'Voit. Jokaisella autolla on oma aikajana, kulut ja raportti.': 'Yes. Each car has its own timeline, costs and report.',
+    'Saanko huoltohistorian auton myyntiä varten?': 'Can I get the service history for selling the car?',
+    'Saat. Auton raportin voi tulostaa tai tallentaa PDF-tiedostoksi ja antaa ostajalle.': 'Yes. You can print the car’s report or save it as a PDF and give it to the buyer.',
+    'Sovelluksen': 'The app’s',
+    '-välilehdeltä löytyy lisää ohjeita.': ' tab has more help.',
+    'YHTEYSTIEDOT': 'CONTACT',
+    'Kysyttävää tai idea?': 'A question or an idea?',
+    'Kuulemme mielellämme.': 'We’d love to hear it.',
+    'Ota yhteyttä': 'Get in touch',
+    'Sähköposti': 'Email',
+    'Lisätään pian': 'Coming soon',
+    'Palaute ja ideat': 'Feedback and ideas',
+    'Sovelluksessa: Apu → Kerro meille': 'In the app: Help → Tell us',
+    'Some': 'Social media',
+    'Tietoa yrityksestä': 'About the company',
+    'AJOURA on suomalainen ajoneuvopäiväkirja, jota kehittää DRONEX.': 'AJOURA is a Finnish vehicle logbook developed by DRONEX.',
+    'Yritys': 'Company',
+    'Y-tunnus': 'Business ID',
+    'Kotipaikka': 'Registered office',
+    'Emme kerää henkilötietoja kokeiluversiossa. Tiedot pysyvät omassa laitteessasi.': 'We don’t collect personal data in the trial version. Your data stays on your own device.',
+    'Tietosuojaseloste': 'Privacy notice',
+    'Lue tietosuojaseloste →': 'Read the privacy notice →',
+    'by DRONEX · Ajoneuvosi historia yhdessä paikassa.': 'by DRONEX · Your vehicle’s history in one place.',
+    'Alatunnisteen linkit': 'Footer links',
+    'Sovellus': 'App',
+    'Lataa': 'Download',
+    'Kieli': 'Language',
+    'Auton huoltohistoria · AJOURA': 'Car service history · AJOURA',
+    'Mikä AJOURA on? →': 'What is AJOURA? →',
+    'Huoltohistoriaa ei voitu avata.': 'The service history could not be opened.',
+    'Linkistä puuttuu auton tiedot.': 'The link is missing the car’s details.',
+    'Pyydä myyjältä uusi linkki AJOURA-sovelluksen raportista (Jaa historia linkkinä).': 'Ask the seller for a new link from the report in the AJOURA app (Share history as a link).',
+    'Selaimesi on liian vanha tämän linkin avaamiseen. Kokeile uudempaa selainta.': 'Your browser is too old to open this link. Try a newer browser.',
+    'Linkki on katkennut tai vaurioitunut. Tarkista, että kopioit sen kokonaan.': 'The link is cut off or damaged. Check that you copied all of it.',
+    'HUOLTOHISTORIA': 'SERVICE HISTORY',
+    'km viimeksi kirjattu': 'km last recorded',
+    'merkintää': 'entries',
+    'kirjatut kulut': 'logged costs',
+    'Merkinnät': 'Entries',
+    'Ei merkintöjä.': 'No entries.',
+    'Kokeile AJOURAa maksutta →': 'Try AJOURA for free →',
+    '✓ Kuitti tallessa omistajalla': '✓ Receipt kept by the owner',
+    'AJOURA etusivu': 'AJOURA home page',
+    'Luonnos testivaiheeseen.': 'Draft for the testing phase.',
+    'Tämä seloste kuvaa AJOURAn nykyisen testiversion. Se päivitetään ja tarkistetaan ennen virallista julkaisua, viimeistään kun sovellukseen tulee kirjautuminen.': 'This notice describes the current test version of AJOURA. It will be updated and reviewed before the official launch, at the latest when sign-in is added to the app.',
+    'Lyhyesti': 'In short',
+    'AJOURA tallentaa autosi, merkintäsi, kuvasi ja nimesi vain omaan laitteeseesi. Emme saa niitä, emmekä voi nähdä niitä. Meillä ei ole palvelinta, käyttäjätilejä, mainoksia eikä kävijäseurantaa.': 'AJOURA stores your cars, entries, photos and name only on your own device. We don’t receive them and cannot see them. We have no server, user accounts, ads or visitor tracking.',
+    'Mitä tietoja sovellus käsittelee': 'What data the app handles',
+    'Antamasi nimi (valinnainen), jota käytetään vain tervehdyksessä.': 'The name you give (optional), used only in the greeting.',
+    'Autojesi tiedot: rekisteritunnus, merkki ja malli, vuosimalli, mittarilukema ja ulkonäkö.': 'Your cars’ details: licence plate, make and model, model year, odometer reading and appearance.',
+    'Huolto-, katsastus-, korjaus- ja tankkausmerkinnät, muistiinpanot sekä lisäämäsi kuvat ja kuitit.': 'Service, inspection, repair and fill-up entries, notes, and the photos and receipts you add.',
+    'Tiedot ovat selaimen tallennustilassa (IndexedDB ja localStorage) tällä laitteella. Ne poistuvat, kun valitset Minä → Poista kaikki tiedot tai tyhjennät selaimen sivustotiedot.': 'The data sits in the browser’s storage (IndexedDB and localStorage) on this device. It is deleted when you choose Me → Delete all data or clear the browser’s site data.',
+    'Milloin tietoja lähtee laitteeltasi': 'When data leaves your device',
+    'Vain silloin, kun itse päätät:': 'Only when you decide:',
+    'Varmuuskopio ja siirtotiedosto': 'Backup and transfer file',
+    'tallentuvat tiedostoon, jonka sijainnin valitset itse.': 'are saved to a file in a location you choose.',
+    'Historia linkkinä': 'History as a link',
+    ': auton tiedot ja merkinnät (ei kuvia, kuitteja eikä muistiinpanoja) ovat linkin sisällä. Jokainen, jolla on linkki, voi avata sen. Linkkiä ei tallenneta palvelimellemme, koska meillä ei ole sellaista.': ': the car’s details and entries (no photos, receipts or notes) are inside the link itself. Anyone with the link can open it. The link is not stored on our server, because we don’t have one.',
+    'Palaute': 'Feedback',
+    'lähtee puhelimen jakovalikon kautta valitsemallesi vastaanottajalle. Mukana on sovelluksen versio ja laitetyyppi.': 'goes through your phone’s share menu to the recipient you choose. It includes the app version and device type.',
+    'Kalenterimuistutus': 'Calendar reminder',
+    'tallentuu puhelimesi kalenteriin.': 'is saved to your phone’s calendar.',
+    'Palvelut, joiden kautta sivu toimii': 'Services the site runs on',
+    '(GitHub Inc.) jakaa sivuston. Kuten kaikki verkkopalvelimet, se näkee teknisiä tietoja, kuten IP-osoitteen, sivua ladattaessa.': '(GitHub Inc.) serves the website. Like every web server, it sees technical data such as the IP address when the page loads.',
+    'Automallien kuvat': 'Car model pictures',
+    'ladataan kuvapalvelun sisällönjakeluverkosta (Amazon CloudFront). Kuvapyyntö kertoo vain, minkä automallin kuva haetaan, ei rekisteritunnusta eikä merkintöjäsi.': 'are loaded from an image service’s content delivery network (Amazon CloudFront). The image request only reveals which car model’s picture is fetched, not your licence plate or entries.',
+    'Rekisterihaku': 'Registry lookup',
+    'Rekisteritunnuksella haku on testivaiheessa simuloitu esimerkkiaineistolla. Tunnusta ei lähetetä mihinkään.': 'During testing, the licence plate lookup is simulated with sample data. The plate is not sent anywhere.',
+    'Oikeutesi': 'Your rights',
+    'Koska tiedot ovat vain sinun laitteessasi, hallitset niitä itse: voit katsoa, muuttaa, viedä (varmuuskopio) ja poistaa ne milloin tahansa sovelluksessa.': 'Because the data is only on your device, you control it yourself: you can view, change, export (backup) and delete it in the app at any time.',
+    'Rekisterinpitäjä ja yhteystiedot': 'Controller and contact details',
+    'AJOURAa kehittävät Hannes ja Niklas (DRONEX). Yhteystiedot ja yrityksen tiedot lisätään tähän ennen virallista julkaisua. Siihen asti palautteen voi lähettää sovelluksen Apu-välilehdeltä.': 'AJOURA is developed by Hannes and Niklas (DRONEX). Contact and company details will be added here before the official launch. Until then, feedback can be sent from the app’s Help tab.',
+    'Päivitetty 13.10.2026': 'Updated 13 Oct 2026',
+    'Linkki kopioitu leikepöydälle.': 'Link copied to the clipboard.',
+    'AJOURA – autosi oma huoltokirja.': 'AJOURA – your car’s own service book.',
+    'Sininen Volvo-farmari': 'Blue Volvo estate',
+  };
+  for (const k in SITE) if (!Object.prototype.hasOwnProperty.call(D, k)) D[k] = SITE[k];
   // Ordered patterns for dynamic strings. Each returns the English string.
   const P = [
     [re('(Huolto|Katsastus) · myöhässä'), (m, w) => (w === 'Huolto' ? 'Service' : 'Inspection') + ' · overdue'],
@@ -411,12 +600,33 @@
       (m, s, d) => 'This report is based on the owner’s own entries' + (s ? ' (example car, fictional data)' : '') + '. It does not replace an official service book from the manufacturer or a workshop. Printed ' + d + '.'],
     [re('Esimerkkiauto: kuvitteellinen historia, rekisteritunnus ja hinnat\\. (.+)'), (m, r) => 'Example car: fictional history, licence plate and prices. ' + (tr(r) || r)],
     [re('(maanantai|tiistai|keskiviikko|torstai|perjantai|lauantai|sunnuntai) (\\d{1,2})\\. (\\S+kuuta)'), (m, d, n, mo) => days[d] + ' ' + n + ' ' + (months[mo] || mo)],
-    [re('AJOURA App — (.+)'), (m, v) => 'AJOURA App — ' + (tr(v) || v)]
+    [re('AJOURA App — (.+)'), (m, v) => 'AJOURA App — ' + (tr(v) || v)],
+    [re('Lukema ei voi olla pienempi kuin auton kirjattu ' + N + ' km\\.'), (m, k) => 'The reading can’t be lower than the car’s recorded ' + k + ' km.'],
+    // Calendar reminder file and share sheet
+    [re('AJOURA: (Huolto|Katsastus)( \\(myöhässä\\))? – (.+)'), (m, w, late, c) => 'AJOURA: ' + (w === 'Huolto' ? 'Service' : 'Inspection') + (late ? ' (overdue)' : '') + ' – ' + c],
+    [re('AJOURAn arvio omien merkintöjesi perusteella(?:, viimeistään ' + N + ' km)?\\.'), (m, k) => 'AJOURA’s estimate based on your own entries' + (k ? ', at the latest at ' + k + ' km' : '') + '.'],
+    [re('(Huolto|Katsastus) lähestyy: (.+)'), (m, w, c) => (w === 'Huolto' ? 'Service' : 'Inspection') + ' coming up: ' + c],
+    [re('Huoltohistoria: (.+)'), (m, c) => 'Service history: ' + c],
+    [re('(.+): huoltohistoria AJOURAsta\\.'), (m, c) => c + ': service history from AJOURA.'],
+    // Shared history page (historia.html)
+    [re('(.+) · huoltohistoria · AJOURA'), (m, c) => c + ' · service history · AJOURA'],
+    [re('merkintää, (\\d+) kuitilla'), (m, n) => 'entries, ' + n + ' with receipt'],
+    [re('✓ Kuitti tallessa omistajalla \\((\\d+)\\)'), (m, n) => '✓ Receipt kept by the owner (' + n + ')'],
+    [re('Tämä on auton omistajan AJOURA-sovellukseen itse kirjaama historia(?: \\((.+?)\\))?\\. AJOURA ei ole tarkistanut tietoja\\. Merkintä "kuitti tallessa" tarkoittaa, että omistaja on liittänyt merkintään kuitin kuvan; pyydä kuitit nähtäväksi\\.(?:\\s*Omistajan kirjaama keskikulutus ' + N + ' (l|kWh)/100 km\\.)?'),
+      (m, span, v, u) => 'This history was entered by the car’s owner in the AJOURA app' + (span ? ' (' + span + ')' : '') + '. AJOURA has not checked the data. “Receipt kept” means the owner attached a photo of the receipt to the entry; ask to see the receipts.' + (v ? ' Average consumption logged by the owner: ' + v.replace(',', '.') + ' ' + u + '/100 km.' : '')],
+    [re('Linkki luotu (.+?)\\. Tallenna tai tulosta sivu selaimen valikosta\\. Oma auto\\?'), (m, d) => 'Link created ' + d + '. Save or print the page from the browser menu. Your own car?']
   ];
+
+  // Language packs: Finnish -> target. Swedish reuses the helpers so its patterns read like the English ones.
+  const PACK = { en: { D, P } };
+  if (typeof window.AjouraSV === 'function') PACK.sv = window.AjouraSV({ re, N, DATE, plural, lower, t: s => t(s), tr: s => tr(s) });
+  if (lang === 'sv' && !PACK.sv) lang = 'fi';
 
   // Translate a trimmed string; returns null when nothing applies.
   function tr(s) {
-    if (!s) return null;
+    const pk = PACK[lang];
+    if (!s || !pk) return null;
+    const D = pk.D, P = pk.P;
     if (Object.prototype.hasOwnProperty.call(D, s)) return D[s];
     for (const [rx, fn] of P) { const m = rx.exec(s); if (m) return fn(...m); }
     // "A · B · C" and "· X": translate segments independently (car names, plates and dates pass through).
@@ -435,7 +645,7 @@
   }
   // Public t(): keeps surrounding whitespace, returns input unchanged when unknown or when lang is 'fi'.
   function t(str) {
-    if (lang !== 'en' || typeof str !== 'string') return str;
+    if (lang === 'fi' || typeof str !== 'string') return str;
     const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(str), out = tr(m[2]);
     return out === null ? str : m[1] + out + m[3];
   }
@@ -471,7 +681,7 @@
     }
   }
   function apply(root) {
-    if (lang !== 'en') return;
+    if (lang === 'fi') return;
     root = root || document.documentElement;
     if (root.nodeType === 3) { doText(root); return; }
     if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
@@ -491,7 +701,7 @@
   }
 
   const observer = new MutationObserver(list => {
-    if (lang !== 'en') return;
+    if (lang === 'fi') return;
     for (const m of list) {
       if (m.type === 'characterData') doText(m.target);
       else if (m.type === 'attributes') { if (m.target.nodeType === 1) doAttrs(m.target); }
@@ -506,19 +716,25 @@
   window.prompt = (msg, def) => nPrompt(t(String(msg)), def);
   window.alert = msg => nAlert(t(String(msg)));
 
+  // Website language buttons: <button data-set-lang="sv">SV</button>; aria-pressed marks the current one.
+  const markButtons = () => { for (const b of document.querySelectorAll('[data-set-lang]')) b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)); };
+  document.addEventListener('click', event => { const b = event.target.closest && event.target.closest('[data-set-lang]'); if (b) setLang(b.dataset.setLang); });
+
   function setLang(next) {
-    next = next === 'en' ? 'en' : 'fi';
+    next = PACK[next] ? next : 'fi';
     try { localStorage.setItem(KEY, next); } catch (e) {}
-    if (next === lang) { if (lang === 'en') apply(); return; }
+    if (next === lang) { if (lang !== 'fi') apply(); markButtons(); return; }
+    restore();
     lang = next; api.lang = lang;
     document.documentElement.lang = lang;
-    if (lang === 'en') apply(); else restore();
+    if (lang !== 'fi') apply();
+    markButtons();
     try { document.dispatchEvent(new CustomEvent('ajoura-lang', { detail: lang })); } catch (e) {}
   }
 
-  const api = { lang, set: setLang, t, apply: root => apply(root) };
+  const api = { lang, langs: ['fi', ...Object.keys(PACK)], set: setLang, t, apply: root => apply(root) };
   window.AjouraI18n = api;
   observe();
-  const start = () => { if (lang === 'en') { document.documentElement.lang = 'en'; apply(); } };
+  const start = () => { markButtons(); if (lang !== 'fi') { document.documentElement.lang = lang; apply(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
