@@ -359,6 +359,15 @@
   });
   // User types: workshop and team views (roles.js). Overrides earlier entries with the same key.
   Object.assign(D, {
+    'Näkymä': 'View', 'Otsikko': 'Title',
+    'Esim. Renkaat, Hallipaikka, Varaosat': 'E.g. Tyres, Parking spot, Parts',
+    '☰ Lista': '☰ List',
+    '▦ Ruudukko': '▦ Grid',
+    'Anna muistiinpanolle otsikko, niin löydät sen helpommin.': 'Give the note a title so it is easier to find.',
+    '✓ Muistiinpano tallennettu.': '✓ Note saved.',
+    'Anna muistiinpanolle otsikko.': 'Give the note a title.',
+    'Muistiinpano ei voi olla tyhjä.': 'A note can’t be empty.',
+    'Muistiinpano poistettu.': 'Note deleted.',
     'Autohuolloille': 'For car workshops',
     'Asiakkaiden nimet ja puhelinnumerot ovat henkilötietoja. Ne pysyvät tässä laitteessa, eikä niitä lähetetä minnekään. Luovutuslinkkiin ei tule asiakkaan nimeä eikä puhelinnumeroa.': 'Customers’ names and phone numbers are personal data. They stay on this device and are not sent anywhere. The handover link does not include the customer’s name or phone number.',
     'Tiimi': 'Team',
