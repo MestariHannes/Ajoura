@@ -1,6 +1,8 @@
 # AJOURA
 
-Digitaalinen ajoneuvopäiväkirja (PWA). Live: https://mestarihannes.github.io/Ajoura/
+Digitaalinen ajoneuvopäiväkirja (PWA).
+
+**AJOURA moved on 19 October 2026 to https://ajoura-app.github.io/ (repository `Ajoura-app/ajoura-app.github.io`, full history).** This repository is kept as a backup. Its pages now run `muutto.js`, which moves each visitor's saved garage to the new address once and then forwards there; `sw.js` clears the old offline cache. The app code below these pages is the last version before the move.
 
 Moved here from `MestariHannes/lavreon` (folder `ajoura/`) on 12 October 2026; earlier history is in that repository. The old address redirects here. Both addresses share the `mestarihannes.github.io` origin, so data saved on a phone (`localStorage`, key `ajoura-app-v2`) is kept.
 
