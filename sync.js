@@ -35,8 +35,17 @@
     try { saveSession(fromAuth(await call('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: session.refresh_token }) }, false))); }
     catch (e) { if (e.status === 400 || e.status === 401 || e.status === 403) { signedOut('Kirjautuminen vanhentui. Kirjaudu uudelleen.'); } throw e; }
   }
-  const sendCode = email => call('/auth/v1/otp', { method: 'POST', body: JSON.stringify({ email, create_user: true }) }, false);
-  const verify = async (email, code) => saveSession(fromAuth(await call('/auth/v1/verify', { method: 'POST', body: JSON.stringify({ type: 'email', email, token: code }) }, false)));
+  // The e-mail carries a sign-in link (Supabase's standard template) or a code (custom template). The link opens
+  // this page in the browser; the installed iPhone app has its own storage, so there the link is pasted instead.
+  const appUrl = () => location.origin + location.pathname;
+  const sendCode = email => call('/auth/v1/otp?redirect_to=' + encodeURIComponent(appUrl()), { method: 'POST', body: JSON.stringify({ email, create_user: true }) }, false);
+  const linkToken = text => { try { const u = new window.URL(text.trim()); const t = u.searchParams.get('token') || u.searchParams.get('token_hash'); return t ? { token_hash: t, type: u.searchParams.get('type') || 'magiclink' } : null; } catch (e) { return null; } };
+  const verify = async (email, input) => { const l = linkToken(input); saveSession(fromAuth(await call('/auth/v1/verify', { method: 'POST', body: JSON.stringify(l || { type: 'email', email, token: input.replace(/\s/g, '') }) }, false))); };
+  // Back from the link in the browser: #access_token=…&refresh_token=… (or #error=… when the link was old).
+  const back = new URLSearchParams(location.hash.slice(1));
+  const fromLink = back.get('access_token') && back.get('refresh_token') ? { access_token: back.get('access_token'), refresh_token: back.get('refresh_token'), expires_in: Number(back.get('expires_in')) || 3600 } : null;
+  if (fromLink || back.get('error_code') || back.get('error_description')) history.replaceState(null, '', location.pathname + location.search + (fromLink ? '#home' : '#login'));
+  let linkFlash = !fromLink && (back.get('error_code') || back.get('error_description')) ? 'Linkki on vanhentunut tai jo käytetty. Pyydä uusi.' : '';
 
   // ---- Merge ----------------------------------------------------------------------------------------
   // Three-way merge against the copy both sides agreed on last time (base): a change on either side wins
@@ -135,7 +144,7 @@
     return 'ok';
   }
   async function sync() {
-    if (!enabled || !session || !App() || !App().state) return;
+    if (!enabled || !session || !session.user.id || !App() || !App().state) return;
     if (running) { again = true; return running; }
     state = 'syncing'; paintStatus();
     running = (async () => {
@@ -162,7 +171,7 @@
   }
 
   // ---- Screens --------------------------------------------------------------------------------------
-  let step = { email: '', sent: false }, flash = '';
+  let step = { email: '', sent: false }, flash = linkFlash;
   const top = '<div class="app-top"><img class="app-brand" src="logo.svg" width="640" height="198" alt="AJOURA"><span class="demo-label">TESTIVERSIO</span></div>';
   const ago = () => { const t = Number(get(syncedKey)); if (!t) return ''; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'juuri nyt' : m < 60 ? m + ' min sitten' : new Intl.DateTimeFormat('fi-FI', { day: 'numeric', month: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(t)); };
   const statusText = () => state === 'syncing' ? 'Synkronoidaan…' : state === 'waiting' ? 'Odottaa, kunnes lomake on tallennettu.' : state === 'error' ? lastError : ago() ? 'Synkronoitu ' + ago() + '.' : 'Ei vielä synkronoitu.';
@@ -171,11 +180,11 @@
     if (session) return `${top}${back}<h2 class="app-heading">Olet kirjautunut</h2><p class="success-note" role="status">Olet kirjautunut tilillä <strong translate="no">${esc(session.user.email)}</strong></p><p>Autosi ja merkintäsi siirtyvät nyt puhelimen ja verkkosivun välillä.</p><a class="app-button" href="#home">Omaan talliin <span aria-hidden="true">→</span></a>`;
     const intro = '<p>Kirjaudu sähköpostilla, niin samat autot ja merkinnät näkyvät puhelimessa ja verkkosivulla. Salasanaa ei tarvita: lähetämme kertakäyttöisen koodin.</p>';
     if (!step.sent) return `${top}${back}<h2 class="app-heading">Kirjaudu sisään</h2>${intro}<form class="app-form" id="sync-email-form" novalidate><label>Sähköposti<input name="email" type="email" required maxlength="120" autocomplete="email" inputmode="email" enterkeyhint="send" placeholder="nimi@esimerkki.fi" value="${esc(step.email)}"></label><p class="error-note" id="sync-error" role="alert">${esc(flash)}</p><button class="app-button" type="submit">Lähetä koodi</button></form><p class="app-fineprint">Jos sinulla on jo autoja tässä laitteessa, ne siirtyvät tilillesi kirjautuessa.<br>Kuvat ja kuitit pysyvät toistaiseksi tässä laitteessa.</p>`;
-    return `${top}${back}<h2 class="app-heading">Syötä koodi</h2><p>Lähetimme koodin osoitteeseen <strong translate="no">${esc(step.email)}</strong></p><p>Katso myös roskapostikansio.</p><form class="app-form" id="sync-code-form" novalidate><label>Koodi<input name="code" required maxlength="10" autocomplete="one-time-code" inputmode="numeric" enterkeyhint="done" placeholder="123456"></label><p class="error-note" id="sync-error" role="alert">${esc(flash)}</p><button class="app-button" type="submit">Kirjaudu</button></form><button class="app-back" type="button" data-sync-restart>← Vaihda sähköposti</button>`;
+    return `${top}${back}<h2 class="app-heading">Avaa sähköposti</h2><p>Lähetimme viestin osoitteeseen <strong translate="no">${esc(step.email)}</strong></p><p>Jos viestissä on kirjautumislinkki, avaa se tällä laitteella. Puhelimeen asennetussa sovelluksessa kopioi linkki (paina linkkiä pitkään → Kopioi) ja liitä se alle.</p><p>Katso myös roskapostikansio.</p><form class="app-form" id="sync-code-form" novalidate><label>Koodi tai linkki<input name="code" required maxlength="2000" autocomplete="one-time-code" enterkeyhint="done" autocapitalize="off" spellcheck="false" placeholder="123456 tai https://…"></label><p class="error-note" id="sync-error" role="alert">${esc(flash)}</p><button class="app-button" type="submit">Kirjaudu</button></form><button class="app-back" type="button" data-sync-restart>← Vaihda sähköposti</button>`;
   }
   function paint(screen) {
     screen.innerHTML = '<div class="screen-content">' + loginView() + '</div>';
-    screen.scrollTop = 0; document.title = 'AJOURA App — Kirjaudu sisään'; flash = '';
+    screen.scrollTop = 0; document.title = 'AJOURA App — Kirjaudu sisään'; // flash stays until the next try or leaving the screen
     const f = screen.querySelector('form input'); if (f) setTimeout(() => f.focus({ preventScroll: true }), 50);
     if (window.AjouraI18n && window.AjouraI18n.apply) window.AjouraI18n.apply(screen);
   }
@@ -192,7 +201,7 @@
 
   document.addEventListener('submit', async ev => {
     const f = ev.target; if (f.id !== 'sync-email-form' && f.id !== 'sync-code-form') return;
-    ev.preventDefault(); const btn = f.querySelector('button[type=submit]'); if (btn.disabled) return;
+    ev.preventDefault(); const btn = f.querySelector('button[type=submit]'); if (btn.disabled) return; flash = '';
     if (f.id === 'sync-email-form') {
       const email = f.email.value.trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return showError('Tarkista sähköpostiosoite.');
@@ -201,11 +210,11 @@
       catch (e) { btn.disabled = false; showError(e.status === 429 ? 'Liian monta koodia lyhyessä ajassa. Odota hetki ja yritä uudelleen.' : e instanceof TypeError ? 'Ei verkkoyhteyttä. Yritä uudelleen.' : 'Koodin lähetys ei onnistunut. Yritä hetken päästä uudelleen.'); }
       return;
     }
-    const code = f.code.value.replace(/\s/g, '');
-    if (!/^\d{6,10}$/.test(code)) return showError('Koodi on numerosarja sähköpostista.');
+    const code = f.code.value.trim();
+    if (!linkToken(code) && !/^\d{6,10}$/.test(code.replace(/\s/g, ''))) return showError('Liitä sähköpostin linkki tai koodi.');
     btn.disabled = true;
     try { await verify(step.email, code); step = { email: '', sent: false }; flash = ''; await sync(); location.hash = 'home'; }
-    catch (e) { btn.disabled = false; showError(e instanceof TypeError ? 'Ei verkkoyhteyttä. Yritä uudelleen.' : 'Koodi ei kelpaa tai se on vanhentunut. Tarkista koodi tai pyydä uusi.'); }
+    catch (e) { btn.disabled = false; showError(e instanceof TypeError ? 'Ei verkkoyhteyttä. Yritä uudelleen.' : 'Linkki tai koodi ei kelpaa tai se on jo käytetty. Pyydä uusi.'); }
   });
   document.addEventListener('click', ev => {
     const t = ev.target;
@@ -213,10 +222,15 @@
     if (t.closest('[data-sync-now]')) sync();
     if (t.closest('[data-sync-out]')) signOut();
   });
-  window.addEventListener('hashchange', () => { if (state === 'waiting') schedule(300); });
+  window.addEventListener('hashchange', () => { if (state === 'waiting') schedule(300); if (!location.hash.startsWith('#login') && !location.hash.startsWith('#me')) flash = ''; });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') schedule(200); });
   window.addEventListener('online', () => schedule(200));
   setInterval(() => { if (document.visibilityState === 'visible') schedule(0); }, 60000);
+
+  if (enabled && fromLink) {
+    session = { ...fromAuth({ ...fromLink, user: { id: '', email: '' } }) };
+    call('/auth/v1/user').then(u => { saveSession({ ...session, user: { id: u.id, email: u.email } }); flash = ''; schedule(0); rerender(); }, () => { session = null; flash = 'Kirjautuminen ei onnistunut. Pyydä uusi linkki.'; location.hash = 'login'; });
+  }
 
   window.AjouraSync = {
     enabled, owns: v => enabled && v === 'login', paint, meCard,
